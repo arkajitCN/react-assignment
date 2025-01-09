@@ -1,10 +1,11 @@
-import { Button } from "@/components/ui/button";
+import ResponsiveScreen from "@/components/layout/responsive-screen";
+import FlowCreationForm from "@/features/flow-creation-form";
 
 export default function App() {
   return (
-    <div>
+    <ResponsiveScreen>
       <h3>React Flow</h3>
-      <Button>Click me</Button>
-    </div>
+      <FlowCreationForm />
+    </ResponsiveScreen>
   );
 }
