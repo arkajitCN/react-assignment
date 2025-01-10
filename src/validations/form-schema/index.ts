@@ -11,7 +11,7 @@ export const flowCreationFormSchema = z.object({
   lifecycle: z.string().min(1, "Lifecycle is required"),
   comments: z.string().min(1, "Comments are required"),
   estimated: z.string().min(1, "Estimated value is required"),
-  tags: z.string().min(1, "At least one tag is required"),
+  tags: z.array(z.string()).min(1, "At least one tag is required"),
 });
 
 export type FlowCreationFormValues = z.infer<typeof flowCreationFormSchema>;

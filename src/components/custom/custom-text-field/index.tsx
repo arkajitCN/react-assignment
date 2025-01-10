@@ -1,44 +1,12 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { FlowCreationFormValues } from "@/validations/form-schema";
-import { Control, Controller, FieldValues } from "react-hook-form";
+import { Input } from "@/components/ui/input";
+import { Controller } from "react-hook-form";
 
-// type TCustomTextFieldProps<T> = {
-//   name: keyof T;
-//   control: Control<FlowCreationFormValues>;
-//   options: Array<{ value: string; label: string }>;
-//   placeholder: string;
-// };
-
-const CustomTextField = ({
-  name,
-  control,
-  options,
-  placeholder = "Select...",
-}: any) => {
+const CustomTextField = ({ control, name, placeholder }: any) => {
   return (
     <Controller
       name={name}
       control={control}
-      render={({ field }) => (
-        <Select onValueChange={field.onChange} defaultValue={field.value}>
-          <SelectTrigger id={name as string}>
-            <SelectValue placeholder={placeholder} />
-          </SelectTrigger>
-          <SelectContent>
-            {options.map(({ value, label }) => (
-              <SelectItem key={value} value={value}>
-                {label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      )}
+      render={({ field }) => <Input id="name" placeholder={placeholder} {...field} />}
     />
   );
 };
