@@ -1,31 +1,32 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import React, { Dispatch, SetStateAction, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  FlowCreationFormValues,
-  flowCreationFormSchema,
-} from "@/validations/form-schema";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { FlowCreationFormValues, flowCreationFormSchema } from "@/validations/form-schema";
 import { Label } from "@/components/ui/label";
-import CustomTextField from "@/components/custom/custom-text-field";
 import { Input } from "@/components/ui/input";
+import CustomSelectField from "@/components/custom/custom-select-field";
+import CustomTextField from "@/components/custom/custom-text-field";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
 
-const FlowCreationForm: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
+type FlowCreationFormProps = {
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
+};
+
+const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }) => {
   const [image, setImage] = useState<string | null>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const {
     control,
     handleSubmit: formSubmitHandler,
     formState: { errors },
+    setValue,
   } = useForm<FlowCreationFormValues>({
     resolver: zodResolver(flowCreationFormSchema),
     defaultValues: {
@@ -39,7 +40,7 @@ const FlowCreationForm: React.FC = () => {
       lifecycle: "",
       comments: "",
       estimated: "",
-      tags: "",
+      tags: [],
     },
   });
 
@@ -56,30 +57,40 @@ const FlowCreationForm: React.FC = () => {
     }
   };
 
+  const handleTagSelect = (tag: string) => {
+    if (!selectedTags.includes(tag)) {
+      const newTags = [...selectedTags, tag];
+      setSelectedTags(newTags);
+      setValue("tags", newTags);
+    }
+  };
+
+  const handleTagRemove = (tag: string) => {
+    const newTags = selectedTags.filter((t) => t !== tag);
+    setSelectedTags(newTags);
+    setValue("tags", newTags);
+  };
+
   const handleFormSubmitRequest = (data: FlowCreationFormValues) => {
-    console.log("data", data);
+    console.log("(FINAL) form data", data);
   };
 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogTrigger asChild>
+        {/* <DialogTrigger asChild>
           <Button>Open Modal</Button>
-        </DialogTrigger>
+        </DialogTrigger> */}
         <DialogContent className="sm:max-w-[780px]">
           <DialogHeader>
-            <DialogTitle className="text-lg text-slate-600">
-              Quick Create
-            </DialogTitle>
+            <DialogTitle className="text-lg text-slate-600">Quick Create</DialogTitle>
           </DialogHeader>
-          <form
-            className="space-y-6"
-            onSubmit={formSubmitHandler(handleFormSubmitRequest)}
-          >
+          <form className="space-y-6" onSubmit={formSubmitHandler(handleFormSubmitRequest)}>
+            {/* // ! =================== ROW 01 ======================================*/}
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center space-x-2">
                 <Label htmlFor="select1">Type</Label>
-                <CustomTextField
+                <CustomSelectField
                   name="type"
                   control={control}
                   options={[
@@ -92,7 +103,7 @@ const FlowCreationForm: React.FC = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <Label htmlFor="select2">Form</Label>
-                <CustomTextField
+                <CustomSelectField
                   name="form"
                   control={control}
                   options={[
@@ -104,22 +115,14 @@ const FlowCreationForm: React.FC = () => {
                 />
               </div>
             </div>
+            {/* // ! =================== ROW 02 ====================================== */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="image">Image Upload</Label>
                 <div className="border-2 border-dashed border-gray-300 rounded-md p-4">
-                  <Input
-                    id="image"
-                    type="file"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
+                  <Input id="image" type="file" onChange={handleImageUpload} className="hidden" />
                   {image ? (
-                    <img
-                      src={image}
-                      alt="Preview"
-                      className="max-w-full h-auto"
-                    />
+                    <img src={image} alt="Preview" className="max-w-full h-auto" />
                   ) : (
                     <label
                       htmlFor="image"
@@ -130,12 +133,173 @@ const FlowCreationForm: React.FC = () => {
                   )}
                 </div>
               </div>
+              <div className="space-y-2">
+                <div>
+                  <Label htmlFor="name">Name</Label>
+                  <CustomTextField control={control} name={"name"} placeholder="Enter name" />
+                  {/* {errors.name && (
+                    <span className="text-red-500 text-sm">{errors.name.message}</span>
+                  )} */}
+                </div>
+                <div>
+                  <Label htmlFor="workflowTemplate">Workflow Template Name</Label>
+                  <CustomTextField control={control} name={"workflowTemplate"} placeholder="Enter template name" />
+                  {/* <Controller
+                    name="workflowTemplate"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        id="workflowTemplate"
+                        placeholder="Enter workflow template name"
+                        {...field}
+                      />
+                    )}
+                  /> */}
+                  {errors.workflowTemplate && (
+                    <span className="text-red-500 text-sm">{errors.workflowTemplate.message}</span>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor="owner">Owner</Label>
+                  <CustomSelectField
+                    name="owner"
+                    control={control}
+                    options={[
+                      { value: "option1", label: "Option 1" },
+                      { value: "option2", label: "Option 2" },
+                      { value: "option3", label: "Option 3" },
+                    ]}
+                    placeholder="Default Workflow Template"
+                  />
+                  {/* <Controller
+                    name="owner"
+                    control={control}
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <SelectTrigger id="owner">
+                          <SelectValue placeholder="Select owner" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="owner1">Owner 1</SelectItem>
+                          <SelectItem value="owner2">Owner 2</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  /> */}
+                  {errors.owner && <span className="text-red-500 text-sm">{errors.owner.message}</span>}
+                </div>
+                <div>
+                  <Label htmlFor="description">Description</Label>
+                  <CustomTextField control={control} name={"description"} placeholder="Enter description" />
+                  {/* <Controller
+                    name="description"
+                    control={control}
+                    render={({ field }) => (
+                      <Textarea
+                        id="description"
+                        placeholder="Enter description"
+                        {...field}
+                      />
+                    )}
+                  /> */}
+                  {errors.description && <span className="text-red-500 text-sm">{errors.description.message}</span>}
+                </div>
+              </div>
             </div>
+            {/* // ! =================== ROW 03 ====================================== */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <div>
+                  <Label htmlFor="lifecycle">Lifecycle</Label>
+                  <Controller
+                    name="lifecycle"
+                    control={control}
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <SelectTrigger id="lifecycle">
+                          <SelectValue placeholder="Select lifecycle" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="lifecycle1">Lifecycle 1</SelectItem>
+                          <SelectItem value="lifecycle2">Lifecycle 2</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.lifecycle && <span className="text-red-500 text-sm">{errors.lifecycle.message}</span>}
+                </div>
+                <div>
+                  <Label htmlFor="comments">Comments</Label>
+                  <Controller
+                    name="comments"
+                    control={control}
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <SelectTrigger id="comments">
+                          <SelectValue placeholder="Select comments" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="comment1">Comment 1</SelectItem>
+                          <SelectItem value="comment2">Comment 2</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.comments && <span className="text-red-500 text-sm">{errors.comments.message}</span>}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div>
+                  <Label htmlFor="estimated">Estimated</Label>
+                  <Controller
+                    name="estimated"
+                    control={control}
+                    render={({ field }) => <Input id="estimated" placeholder="Enter estimated value" {...field} />}
+                  />
+                  {errors.estimated && <span className="text-red-500 text-sm">{errors.estimated.message}</span>}
+                </div>
+                <div>
+                  <Label htmlFor="tags">Tags</Label>
+                  <Controller
+                    name="tags"
+                    control={control}
+                    render={({ field }) => (
+                      <div>
+                        <Select onValueChange={(value) => handleTagSelect(value)}>
+                          <SelectTrigger id="tags">
+                            <SelectValue placeholder="Select tags" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="tag1">Tag 1</SelectItem>
+                            <SelectItem value="tag2">Tag 2</SelectItem>
+                            <SelectItem value="tag3">Tag 3</SelectItem>
+                            <SelectItem value="tag4">Tag 4</SelectItem>
+                            <SelectItem value="tag5">Tag 5</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {selectedTags.map((tag) => (
+                            <Badge key={tag} variant="secondary" className="text-sm">
+                              {tag}
+                              <Button variant="ghost" className="h-auto p-0 ml-2" onClick={() => handleTagRemove(tag)}>
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  />
+                  {errors.tags && <span className="text-red-500 text-sm">{errors.tags.message}</span>}
+                </div>
+              </div>
+            </div>
+            {/* // ! =================== SUBMIT / CANCEL BUTTON =======================*/}
             <div className="flex justify-center space-x-2">
               <Button variant="outline" onClick={() => setIsOpen(false)}>
                 Cancel
               </Button>
-              <Button className="bg-blue-800 hover:bg-blue-900" type="submit">
+              <Button className="bg-blue-800 hover:bg-blue-900" type="submit" onClick={() => console.log("clicking!")}>
                 Create
               </Button>
             </div>
