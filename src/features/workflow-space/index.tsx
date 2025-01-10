@@ -11,14 +11,16 @@ import {
   applyNodeChanges,
   ReactFlow,
 } from "@xyflow/react";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CustomNode from "./custom-node";
 
 import "@xyflow/react/dist/style.css";
 
 export default function Workflowspace() {
-  const { workflows, currentWorkflow, isEditing } = useSelector((state: RootState) => state.workflow);
+  const [isEditing, setIsEditing] = useState<boolean>(true);
+
+  const { workflows, currentWorkflow } = useSelector((state: RootState) => state.workflow);
   const currentWorkflowData = workflows.find((w) => w.id === currentWorkflow);
 
   const dispatch = useDispatch();
@@ -53,14 +55,8 @@ export default function Workflowspace() {
     [currentWorkflowData, dispatch, isEditing]
   );
 
-  const handleAddWorkflow = (name: string) => {
-    const id = Date.now().toString();
-    dispatch(addWorkflow({ id, name }));
-    dispatch(setCurrentWorkflow(id));
-  };
-
   return (
-    <div className="h-screen w-full flex flex-col">
+    <div className="h-[90vh] w-full flex flex-col">
       <div className="flex-grow">
         {currentWorkflowData ? (
           <ReactFlow

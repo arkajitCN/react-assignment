@@ -23,6 +23,7 @@ const workflowSlice = createSlice({
       }
     },
     updateEdges: (state, action: PayloadAction<Edge[]>) => {
+      console.log("DEBUG", state, action);
       const workflow = state.workflows.find((w) => w.id === state.currentWorkflow);
       if (workflow) {
         workflow.edges = action.payload;
