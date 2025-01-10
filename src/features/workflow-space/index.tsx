@@ -5,20 +5,19 @@ import {
   Controls,
   MiniMap,
   NodeTypes,
-  Node,
-  Edge,
   Connection,
   addEdge,
   applyEdgeChanges,
   applyNodeChanges,
   ReactFlow,
 } from "@xyflow/react";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CustomNode from "./custom-node";
 
+import "@xyflow/react/dist/style.css";
+
 export default function Workflowspace() {
-  const [showAddPopup, setShowAddPopup] = useState(false);
   const { workflows, currentWorkflow, isEditing } = useSelector((state: RootState) => state.workflow);
   const currentWorkflowData = workflows.find((w) => w.id === currentWorkflow);
 
@@ -54,34 +53,14 @@ export default function Workflowspace() {
     [currentWorkflowData, dispatch, isEditing]
   );
 
-  const handleAdd = () => {
-    setShowAddPopup(true);
-  };
-
-  const handleEdit = () => {
-    dispatch(setEditing(true));
-  };
-
-  const handleSave = () => {
-    dispatch(setEditing(false));
-    console.log("Saving workflow:", currentWorkflowData);
-  };
-
   const handleAddWorkflow = (name: string) => {
     const id = Date.now().toString();
     dispatch(addWorkflow({ id, name }));
     dispatch(setCurrentWorkflow(id));
-    setShowAddPopup(false);
   };
 
   return (
-    <main className="h-screen flex flex-col">
-      {/* <Toolbar
-        onAdd={handleAdd}
-        onEdit={handleEdit}
-        onSave={handleSave}
-        isEditing={isEditing}
-      /> */}
+    <div className="h-screen w-full flex flex-col">
       <div className="flex-grow">
         {currentWorkflowData ? (
           <ReactFlow
@@ -108,12 +87,6 @@ export default function Workflowspace() {
           </div>
         )}
       </div>
-      {/* {showAddPopup && (
-        <AddWorkflowPopup
-          onAdd={handleAddWorkflow}
-          onClose={() => setShowAddPopup(false)}
-        />
-      )} */}
-    </main>
+    </div>
   );
 }
