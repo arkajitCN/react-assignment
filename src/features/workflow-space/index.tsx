@@ -1,5 +1,6 @@
+// Workflowspace Component
 import { RootState } from "@/store";
-import { addWorkflow, setCurrentWorkflow, setEditing, updateEdges, updateNodes } from "@/store/workflow/slice";
+import { updateEdges, updateNodes } from "@/store/workflow/slice";
 import {
   Background,
   Controls,
@@ -11,7 +12,7 @@ import {
   applyNodeChanges,
   ReactFlow,
 } from "@xyflow/react";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CustomNode from "./custom-node";
 
@@ -21,12 +22,20 @@ export default function Workflowspace() {
   const [isEditing, setIsEditing] = useState<boolean>(true);
 
   const { workflows, currentWorkflow } = useSelector((state: RootState) => state.workflow);
-  const currentWorkflowData = workflows.find((w) => w.id === currentWorkflow);
+  const currentWorkflowData = useMemo(
+    () => workflows.find((w) => w.id === currentWorkflow),
+    [workflows, currentWorkflow]
+  );
+
+  console.log("DEBUG", workflows);
 
   const dispatch = useDispatch();
-  const nodeTypes: NodeTypes = {
-    custom: CustomNode,
-  };
+  const nodeTypes: NodeTypes = useMemo(
+    () => ({
+      custom: CustomNode,
+    }),
+    []
+  );
 
   const onNodesChange = useCallback(
     (changes: any) => {

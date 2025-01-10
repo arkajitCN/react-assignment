@@ -15,6 +15,7 @@ import { FlowCreationFormValues, flowCreationFormSchema } from "@/validations/fo
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useDispatch } from "react-redux";
 import { addWorkflow, setCurrentWorkflow } from "@/store/workflow/slice";
+import { Node } from "@xyflow/react";
 
 type FlowCreationFormProps = {
   isOpen: boolean;
@@ -77,10 +78,30 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
   };
 
   const handleFormSubmitRequest = (data: FlowCreationFormValues) => {
-    console.log("(FINAL) form data", data);
+    // Generate a unique ID for the workflow
     const id = Date.now().toString();
-    dispatch(addWorkflow({ id, name: data.workflowName }));
+
+    const defaultNode: Node = {
+      id: Date.now().toString(),
+      type: "input",
+      data: { label: "Input Node" }, // Node data
+      position: { x: window.innerWidth / 2, y: window.innerHeight / 2 }, // Center of the screen
+      draggable: true,
+    };
+
+    // Prepare the flow data
+    const flowData = {
+      id,
+      name: data.workflowName.trim(),
+      nodes: [defaultNode],
+      edges: [],
+    };
+
+    // Dispatch actions to add the workflow and set it as current
+    dispatch(addWorkflow(flowData));
     dispatch(setCurrentWorkflow(id));
+
+    // Close the modal or form
     setIsOpen(false);
   };
 
