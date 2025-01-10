@@ -1,42 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Node, Edge } from "@xyflow/react";
-
-interface WorkflowState {
-  workflows: { id: string; name: string; nodes: Node[]; edges: Edge[] }[];
-  currentWorkflow: string | null;
-  isEditing: boolean;
-}
-
-const initialNodes: Node[] = [
-  {
-    id: "1",
-    type: "input",
-    data: { label: "Input Node" },
-    position: { x: 250, y: 5 },
-  },
-  {
-    id: "2",
-    data: { label: "Default Node" },
-    position: { x: 100, y: 100 },
-  },
-  {
-    id: "3",
-    type: "output",
-    data: { label: "Output Node" },
-    position: { x: 250, y: 200 },
-  },
-];
-
-const initialEdges: Edge[] = [
-  { id: "e1-2", source: "1", target: "2" },
-  { id: "e2-3", source: "2", target: "3" },
-];
-
-const initialState: WorkflowState = {
-  workflows: [],
-  currentWorkflow: null,
-  isEditing: false,
-};
+import { initialEdges, initialNodes, initialState } from "./initial-state";
 
 const workflowSlice = createSlice({
   name: "workflow",
@@ -70,6 +34,5 @@ const workflowSlice = createSlice({
   },
 });
 
-export const { addWorkflow, setCurrentWorkflow, updateNodes, updateEdges, setEditing } =
-  workflowSlice.actions;
+export const { addWorkflow, setCurrentWorkflow, updateNodes, updateEdges, setEditing } = workflowSlice.actions;
 export default workflowSlice.reducer;

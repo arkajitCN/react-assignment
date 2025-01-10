@@ -1,5 +1,5 @@
 import { RootState } from "@/store";
-import { addWorkflow, setCurrentWorkflow, setEditing, updateEdges, updateNodes } from "@/store/slice/workflow-slice";
+import { addWorkflow, setCurrentWorkflow, setEditing, updateEdges, updateNodes } from "@/store/workflow/slice";
 import {
   Background,
   Controls,

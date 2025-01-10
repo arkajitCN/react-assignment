@@ -1,35 +1,24 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  FlowCreationFormValues,
-  flowCreationFormSchema,
-} from "@/validations/form-schema";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { FlowCreationFormValues, flowCreationFormSchema } from "@/validations/form-schema";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import CustomSelectField from "@/components/custom/custom-select-field";
 import CustomTextField from "@/components/custom/custom-text-field";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 
-const FlowCreationForm: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
+type FlowCreationFormProps = {
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
+};
+
+const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }) => {
   const [image, setImage] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
@@ -89,17 +78,14 @@ const FlowCreationForm: React.FC = () => {
   return (
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogTrigger asChild>
+        {/* <DialogTrigger asChild>
           <Button>Open Modal</Button>
-        </DialogTrigger>
+        </DialogTrigger> */}
         <DialogContent className="sm:max-w-[780px]">
           <DialogHeader>
             <DialogTitle className="text-lg text-slate-600">Quick Create</DialogTitle>
           </DialogHeader>
-          <form
-            className="space-y-6"
-            onSubmit={formSubmitHandler(handleFormSubmitRequest)}
-          >
+          <form className="space-y-6" onSubmit={formSubmitHandler(handleFormSubmitRequest)}>
             {/* // ! =================== ROW 01 ======================================*/}
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center space-x-2">
@@ -134,12 +120,7 @@ const FlowCreationForm: React.FC = () => {
               <div className="space-y-2">
                 <Label htmlFor="image">Image Upload</Label>
                 <div className="border-2 border-dashed border-gray-300 rounded-md p-4">
-                  <Input
-                    id="image"
-                    type="file"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
+                  <Input id="image" type="file" onChange={handleImageUpload} className="hidden" />
                   {image ? (
                     <img src={image} alt="Preview" className="max-w-full h-auto" />
                   ) : (
@@ -155,22 +136,14 @@ const FlowCreationForm: React.FC = () => {
               <div className="space-y-2">
                 <div>
                   <Label htmlFor="name">Name</Label>
-                  <CustomTextField
-                    control={control}
-                    name={"name"}
-                    placeholder="Enter name"
-                  />
+                  <CustomTextField control={control} name={"name"} placeholder="Enter name" />
                   {/* {errors.name && (
                     <span className="text-red-500 text-sm">{errors.name.message}</span>
                   )} */}
                 </div>
                 <div>
                   <Label htmlFor="workflowTemplate">Workflow Template Name</Label>
-                  <CustomTextField
-                    control={control}
-                    name={"workflowTemplate"}
-                    placeholder="Enter template name"
-                  />
+                  <CustomTextField control={control} name={"workflowTemplate"} placeholder="Enter template name" />
                   {/* <Controller
                     name="workflowTemplate"
                     control={control}
@@ -183,9 +156,7 @@ const FlowCreationForm: React.FC = () => {
                     )}
                   /> */}
                   {errors.workflowTemplate && (
-                    <span className="text-red-500 text-sm">
-                      {errors.workflowTemplate.message}
-                    </span>
+                    <span className="text-red-500 text-sm">{errors.workflowTemplate.message}</span>
                   )}
                 </div>
                 <div>
@@ -215,17 +186,11 @@ const FlowCreationForm: React.FC = () => {
                       </Select>
                     )}
                   /> */}
-                  {errors.owner && (
-                    <span className="text-red-500 text-sm">{errors.owner.message}</span>
-                  )}
+                  {errors.owner && <span className="text-red-500 text-sm">{errors.owner.message}</span>}
                 </div>
                 <div>
                   <Label htmlFor="description">Description</Label>
-                  <CustomTextField
-                    control={control}
-                    name={"description"}
-                    placeholder="Enter description"
-                  />
+                  <CustomTextField control={control} name={"description"} placeholder="Enter description" />
                   {/* <Controller
                     name="description"
                     control={control}
@@ -237,11 +202,7 @@ const FlowCreationForm: React.FC = () => {
                       />
                     )}
                   /> */}
-                  {errors.description && (
-                    <span className="text-red-500 text-sm">
-                      {errors.description.message}
-                    </span>
-                  )}
+                  {errors.description && <span className="text-red-500 text-sm">{errors.description.message}</span>}
                 </div>
               </div>
             </div>
@@ -265,11 +226,7 @@ const FlowCreationForm: React.FC = () => {
                       </Select>
                     )}
                   />
-                  {errors.lifecycle && (
-                    <span className="text-red-500 text-sm">
-                      {errors.lifecycle.message}
-                    </span>
-                  )}
+                  {errors.lifecycle && <span className="text-red-500 text-sm">{errors.lifecycle.message}</span>}
                 </div>
                 <div>
                   <Label htmlFor="comments">Comments</Label>
@@ -288,11 +245,7 @@ const FlowCreationForm: React.FC = () => {
                       </Select>
                     )}
                   />
-                  {errors.comments && (
-                    <span className="text-red-500 text-sm">
-                      {errors.comments.message}
-                    </span>
-                  )}
+                  {errors.comments && <span className="text-red-500 text-sm">{errors.comments.message}</span>}
                 </div>
               </div>
               <div className="space-y-2">
@@ -301,19 +254,9 @@ const FlowCreationForm: React.FC = () => {
                   <Controller
                     name="estimated"
                     control={control}
-                    render={({ field }) => (
-                      <Input
-                        id="estimated"
-                        placeholder="Enter estimated value"
-                        {...field}
-                      />
-                    )}
+                    render={({ field }) => <Input id="estimated" placeholder="Enter estimated value" {...field} />}
                   />
-                  {errors.estimated && (
-                    <span className="text-red-500 text-sm">
-                      {errors.estimated.message}
-                    </span>
-                  )}
+                  {errors.estimated && <span className="text-red-500 text-sm">{errors.estimated.message}</span>}
                 </div>
                 <div>
                   <Label htmlFor="tags">Tags</Label>
@@ -338,11 +281,7 @@ const FlowCreationForm: React.FC = () => {
                           {selectedTags.map((tag) => (
                             <Badge key={tag} variant="secondary" className="text-sm">
                               {tag}
-                              <Button
-                                variant="ghost"
-                                className="h-auto p-0 ml-2"
-                                onClick={() => handleTagRemove(tag)}
-                              >
+                              <Button variant="ghost" className="h-auto p-0 ml-2" onClick={() => handleTagRemove(tag)}>
                                 <X className="h-3 w-3" />
                               </Button>
                             </Badge>
@@ -351,9 +290,7 @@ const FlowCreationForm: React.FC = () => {
                       </div>
                     )}
                   />
-                  {errors.tags && (
-                    <span className="text-red-500 text-sm">{errors.tags.message}</span>
-                  )}
+                  {errors.tags && <span className="text-red-500 text-sm">{errors.tags.message}</span>}
                 </div>
               </div>
             </div>
@@ -362,11 +299,7 @@ const FlowCreationForm: React.FC = () => {
               <Button variant="outline" onClick={() => setIsOpen(false)}>
                 Cancel
               </Button>
-              <Button
-                className="bg-blue-800 hover:bg-blue-900"
-                type="submit"
-                onClick={() => console.log("clicking!")}
-              >
+              <Button className="bg-blue-800 hover:bg-blue-900" type="submit" onClick={() => console.log("clicking!")}>
                 Create
               </Button>
             </div>
