@@ -2,16 +2,20 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+
+import { X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { FlowCreationFormValues, flowCreationFormSchema } from "@/validations/form-schema";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import CustomSelectField from "@/components/custom/custom-select-field";
 import CustomTextField from "@/components/custom/custom-text-field";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { FlowCreationFormValues, flowCreationFormSchema } from "@/validations/form-schema";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { addWorkflow, setCurrentWorkflow } from "@/store/workflow/slice";
+import { Node } from "@xyflow/react";
 
 type FlowCreationFormProps = {
   isOpen: boolean;
@@ -22,9 +26,11 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
   const [image, setImage] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
+  const dispatch = useDispatch();
+
   const {
     control,
-    handleSubmit: formSubmitHandler,
+    handleSubmit,
     formState: { errors },
     setValue,
   } = useForm<FlowCreationFormValues>({
@@ -72,7 +78,31 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
   };
 
   const handleFormSubmitRequest = (data: FlowCreationFormValues) => {
-    console.log("(FINAL) form data", data);
+    // Generate a unique ID for the workflow
+    const id = Date.now().toString();
+
+    const defaultNode: Node = {
+      id: Date.now().toString(),
+      type: "input",
+      data: { label: "Input Node" }, // Node data
+      position: { x: window.innerWidth / 2, y: window.innerHeight / 2 }, // Center of the screen
+      draggable: true,
+    };
+
+    // Prepare the flow data
+    const flowData = {
+      id,
+      name: data.workflowName.trim(),
+      nodes: [defaultNode],
+      edges: [],
+    };
+
+    // Dispatch actions to add the workflow and set it as current
+    dispatch(addWorkflow(flowData));
+    dispatch(setCurrentWorkflow(id));
+
+    // Close the modal or form
+    setIsOpen(false);
   };
 
   return (
@@ -85,7 +115,7 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
           <DialogHeader>
             <DialogTitle className="text-lg text-slate-600">Quick Create</DialogTitle>
           </DialogHeader>
-          <form className="space-y-6" onSubmit={formSubmitHandler(handleFormSubmitRequest)}>
+          <form onSubmit={handleSubmit(handleFormSubmitRequest)} className="space-y-6">
             {/* // ! =================== ROW 01 ======================================*/}
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center space-x-2">
@@ -135,8 +165,8 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
               </div>
               <div className="space-y-2">
                 <div>
-                  <Label htmlFor="name">Name</Label>
-                  <CustomTextField control={control} name={"name"} placeholder="Enter name" />
+                  <Label htmlFor="workflowName">Name</Label>
+                  <CustomTextField control={control} name={"workflowName"} placeholder="Enter name" />
                   {/* {errors.name && (
                     <span className="text-red-500 text-sm">{errors.name.message}</span>
                   )} */}
@@ -299,7 +329,7 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
               <Button variant="outline" onClick={() => setIsOpen(false)}>
                 Cancel
               </Button>
-              <Button className="bg-blue-800 hover:bg-blue-900" type="submit" onClick={() => console.log("clicking!")}>
+              <Button type="submit" className="bg-blue-800 hover:bg-blue-900">
                 Create
               </Button>
             </div>
