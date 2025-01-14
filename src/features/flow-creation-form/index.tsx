@@ -12,9 +12,15 @@ import CustomSelectField from "@/components/custom/custom-select-field";
 import CustomTextField from "@/components/custom/custom-text-field";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FlowCreationFormValues, flowCreationFormSchema } from "@/validations/form-schema";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useDispatch } from "react-redux";
-import { addWorkflow, setCurrentWorkflow } from "@/store/workflow/slice";
+import { addNodesToWorkflow, addWorkflow, setCurrentWorkflow } from "@/store/workflow/slice";
 import { Node } from "@xyflow/react";
 
 type FlowCreationFormProps = {
@@ -29,6 +35,7 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
   const dispatch = useDispatch();
 
   const {
+    reset,
     control,
     handleSubmit,
     formState: { errors },
@@ -53,6 +60,8 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
   // ! ===================== (HANDLE CHANGE AND HANLE SUBMIT FUNCTIONS) ======================
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("HANDLE UPLOAD => ", event.target.files);
+    event.stopPropagation();
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -61,6 +70,7 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
       };
       reader.readAsDataURL(file);
     }
+    event.target.value = "";
   };
 
   const handleTagSelect = (tag: string) => {
@@ -77,10 +87,43 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
     setValue("tags", newTags);
   };
 
+  const handleResetFormFields = () => {
+    reset();
+    setImage(null);
+    setSelectedTags([]);
+  };
+
+  const handleImageRemove = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    console.log("CHECK CLEAR=>");
+    event.stopPropagation();
+    setImage(null);
+    setValue("image", "");
+  };
+
   const handleFormSubmitRequest = (data: FlowCreationFormValues) => {
-    // Generate a unique ID for the workflow
     const id = Date.now().toString();
 
+    // Prepare the initial flow data with a single node (or none)
+    const flowData = {
+      id,
+      name: data.workflowName.trim(),
+      nodes: [], // Start with an empty node list
+      edges: [], // Start with an empty edge list
+    };
+
+    // Dispatch action to create the workflow
+    dispatch(addWorkflow(flowData));
+
+    // Dispatch action to set this as the current workflow
+    dispatch(setCurrentWorkflow(id));
+
+    // Reset the form fields
+    handleResetFormFields();
+
+    // Close the modal or form
+    setIsOpen(false);
+
+    // Add default node after workflow creation
     const defaultNode: Node = {
       id: Date.now().toString(),
       type: "input",
@@ -89,28 +132,13 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
       draggable: true,
     };
 
-    // Prepare the flow data
-    const flowData = {
-      id,
-      name: data.workflowName.trim(),
-      nodes: [defaultNode],
-      edges: [],
-    };
-
-    // Dispatch actions to add the workflow and set it as current
-    dispatch(addWorkflow(flowData));
-    dispatch(setCurrentWorkflow(id));
-
-    // Close the modal or form
-    setIsOpen(false);
+    // Dispatch action to add the default node
+    dispatch(addNodesToWorkflow({ workflowId: id, nodes: [defaultNode] }));
   };
 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        {/* <DialogTrigger asChild>
-          <Button>Open Modal</Button>
-        </DialogTrigger> */}
         <DialogContent className="sm:max-w-[780px]">
           <DialogHeader>
             <DialogTitle className="text-lg text-slate-600">Quick Create</DialogTitle>
@@ -149,14 +177,30 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="image">Image Upload</Label>
-                <div className="border-2 border-dashed border-gray-300 rounded-md p-4">
+                <div className="flex justify-center items-center border-2 border-dashed border-gray-300 rounded-md p-4 relative">
                   <Input id="image" type="file" onChange={handleImageUpload} className="hidden" />
+                  {image && (
+                    <div
+                      onClick={handleImageRemove}
+                      className="absolute top-0 right-0 m-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-lg hover:bg-red-600"
+                      aria-label="Clear Image"
+                    >
+                      <X width={14} />
+                    </div>
+                  )}
+
                   {image ? (
-                    <img src={image} alt="Preview" className="max-w-full h-auto" />
+                    <div>
+                      <img
+                        src={image}
+                        alt="Preview"
+                        className="w-40 h-40 object-cover rounded-md"
+                      />
+                    </div>
                   ) : (
                     <label
                       htmlFor="image"
-                      className="cursor-pointer flex items-center justify-center h-40 bg-gray-100 text-gray-500"
+                      className="cursor-pointer flex items-center justify-center w-40 h-40 bg-gray-100 text-gray-500 rounded-md"
                     >
                       Click to upload image
                     </label>
@@ -166,25 +210,22 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
               <div className="space-y-2">
                 <div>
                   <Label htmlFor="workflowName">Name</Label>
-                  <CustomTextField control={control} name={"workflowName"} placeholder="Enter name" />
-                  {/* {errors.name && (
-                    <span className="text-red-500 text-sm">{errors.name.message}</span>
-                  )} */}
+                  <CustomTextField
+                    control={control}
+                    name={"workflowName"}
+                    placeholder="Enter name"
+                  />
+                  {errors.workflowName && (
+                    <span className="text-red-500 text-sm">{errors.workflowName.message}</span>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="workflowTemplate">Workflow Template Name</Label>
-                  <CustomTextField control={control} name={"workflowTemplate"} placeholder="Enter template name" />
-                  {/* <Controller
-                    name="workflowTemplate"
+                  <CustomTextField
                     control={control}
-                    render={({ field }) => (
-                      <Input
-                        id="workflowTemplate"
-                        placeholder="Enter workflow template name"
-                        {...field}
-                      />
-                    )}
-                  /> */}
+                    name={"workflowTemplate"}
+                    placeholder="Enter template name"
+                  />
                   {errors.workflowTemplate && (
                     <span className="text-red-500 text-sm">{errors.workflowTemplate.message}</span>
                   )}
@@ -216,11 +257,17 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
                       </Select>
                     )}
                   /> */}
-                  {errors.owner && <span className="text-red-500 text-sm">{errors.owner.message}</span>}
+                  {errors.owner && (
+                    <span className="text-red-500 text-sm">{errors.owner.message}</span>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="description">Description</Label>
-                  <CustomTextField control={control} name={"description"} placeholder="Enter description" />
+                  <CustomTextField
+                    control={control}
+                    name={"description"}
+                    placeholder="Enter description"
+                  />
                   {/* <Controller
                     name="description"
                     control={control}
@@ -232,7 +279,9 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
                       />
                     )}
                   /> */}
-                  {errors.description && <span className="text-red-500 text-sm">{errors.description.message}</span>}
+                  {errors.description && (
+                    <span className="text-red-500 text-sm">{errors.description.message}</span>
+                  )}
                 </div>
               </div>
             </div>
@@ -256,7 +305,9 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
                       </Select>
                     )}
                   />
-                  {errors.lifecycle && <span className="text-red-500 text-sm">{errors.lifecycle.message}</span>}
+                  {errors.lifecycle && (
+                    <span className="text-red-500 text-sm">{errors.lifecycle.message}</span>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="comments">Comments</Label>
@@ -275,7 +326,9 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
                       </Select>
                     )}
                   />
-                  {errors.comments && <span className="text-red-500 text-sm">{errors.comments.message}</span>}
+                  {errors.comments && (
+                    <span className="text-red-500 text-sm">{errors.comments.message}</span>
+                  )}
                 </div>
               </div>
               <div className="space-y-2">
@@ -284,9 +337,13 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
                   <Controller
                     name="estimated"
                     control={control}
-                    render={({ field }) => <Input id="estimated" placeholder="Enter estimated value" {...field} />}
+                    render={({ field }) => (
+                      <Input id="estimated" placeholder="Enter estimated value" {...field} />
+                    )}
                   />
-                  {errors.estimated && <span className="text-red-500 text-sm">{errors.estimated.message}</span>}
+                  {errors.estimated && (
+                    <span className="text-red-500 text-sm">{errors.estimated.message}</span>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="tags">Tags</Label>
@@ -311,7 +368,11 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
                           {selectedTags.map((tag) => (
                             <Badge key={tag} variant="secondary" className="text-sm">
                               {tag}
-                              <Button variant="ghost" className="h-auto p-0 ml-2" onClick={() => handleTagRemove(tag)}>
+                              <Button
+                                variant="ghost"
+                                className="h-auto p-0 ml-2"
+                                onClick={() => handleTagRemove(tag)}
+                              >
                                 <X className="h-3 w-3" />
                               </Button>
                             </Badge>
@@ -320,7 +381,9 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
                       </div>
                     )}
                   />
-                  {errors.tags && <span className="text-red-500 text-sm">{errors.tags.message}</span>}
+                  {errors.tags && (
+                    <span className="text-red-500 text-sm">{errors.tags.message}</span>
+                  )}
                 </div>
               </div>
             </div>

@@ -5,8 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FlowCreationFormValues } from "@/validations/form-schema";
-import { Control, Controller, FieldValues } from "react-hook-form";
+import { Controller } from "react-hook-form";
 
 // type TCustomTextFieldProps<T> = {
 //   name: keyof T;
@@ -15,12 +14,7 @@ import { Control, Controller, FieldValues } from "react-hook-form";
 //   placeholder: string;
 // };
 
-const CustomSelectField = ({
-  name,
-  control,
-  options,
-  placeholder = "Select...",
-}: any) => {
+const CustomSelectField = ({ name, control, options, placeholder = "Select..." }: any) => {
   return (
     <Controller
       name={name}
