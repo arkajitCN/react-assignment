@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useDispatch } from "react-redux";
-import { addNodesToWorkflow, addWorkflow, setCurrentWorkflow } from "@/store/workflow/slice";
+import { addWorkflow, setCurrentWorkflow } from "@/store/workflow/slice";
 import { Node } from "@xyflow/react";
 
 type FlowCreationFormProps = {
@@ -131,9 +131,6 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
       position: { x: window.innerWidth / 2, y: window.innerHeight / 2 }, // Center of the screen
       draggable: true,
     };
-
-    // Dispatch action to add the default node
-    dispatch(addNodesToWorkflow({ workflowId: id, nodes: [defaultNode] }));
   };
 
   return (
