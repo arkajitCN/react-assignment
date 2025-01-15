@@ -20,7 +20,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useDispatch } from "react-redux";
-import { addWorkflow, setCurrentWorkflow } from "@/store/workflow/slice";
 import { Node } from "@xyflow/react";
 
 type FlowCreationFormProps = {
@@ -110,12 +109,6 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
       nodes: [], // Start with an empty node list
       edges: [], // Start with an empty edge list
     };
-
-    // Dispatch action to create the workflow
-    dispatch(addWorkflow(flowData));
-
-    // Dispatch action to set this as the current workflow
-    dispatch(setCurrentWorkflow(id));
 
     // Reset the form fields
     handleResetFormFields();

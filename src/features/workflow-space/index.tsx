@@ -1,13 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
 import { AppDispatch, RootState } from "@/store";
-import {
-  addEdge,
-  addNode,
-  deleteEdge,
-  deleteNode,
-  updateNode,
-  updateNodePosition,
-} from "@/store/flow/slice";
+import { addEdge, addNode, deleteEdge, deleteNode, updateNodePosition } from "@/store/flow/slice";
 import { NodeType } from "@/store/flow/state";
 import {
   ReactFlowProvider,
@@ -17,7 +11,6 @@ import {
   Connection,
   ReactFlow,
 } from "@xyflow/react";
-
 import "@xyflow/react/dist/style.css";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -43,22 +36,6 @@ export default function Workflowspace() {
       position: { x: Math.random() * 400, y: Math.random() * 400 },
     };
     dispatch(addNode(newNode));
-  };
-
-  const updateNodeLabel = (nodeId: string, newLabel: string) => {
-    setNodes((prevNodes) =>
-      prevNodes.map((node) =>
-        node.id === nodeId ? { ...node, data: { ...node.data, label: newLabel } } : node
-      )
-    );
-  };
-
-  const moveNode = (nodeId: string, newX: number, newY: number) => {
-    setNodes((prevNodes) =>
-      prevNodes.map((node) =>
-        node.id === nodeId ? { ...node, position: { x: newX, y: newY } } : node
-      )
-    );
   };
 
   const onNodesChange: (changes: any[]) => void = (changes) => {
@@ -89,14 +66,8 @@ export default function Workflowspace() {
       <Button className="w-fit" onClick={() => handleAddNodes()}>
         Add Node
       </Button>
-      <Button className="w-fit" onClick={() => updateNodeLabel("1", "Updated Label")}>
-        Update Node 1
-      </Button>
       <Button className="w-fit" onClick={() => deleteNode("2")}>
         Delete Node 2
-      </Button>
-      <Button className="w-fit" onClick={() => moveNode("3", 500, 200)}>
-        Move Node 3
       </Button>
 
       <ReactFlowProvider>
