@@ -1,56 +1,48 @@
 import { Button } from "@/components/ui/button";
+import { AppDispatch, RootState } from "@/store";
+import {
+  addEdge,
+  addNode,
+  deleteEdge,
+  deleteNode,
+  updateNode,
+  updateNodePosition,
+} from "@/store/flow/slice";
+import { NodeType } from "@/store/flow/state";
 import {
   ReactFlowProvider,
-  addEdge,
   Background,
   Controls,
   MiniMap,
-  Node,
-  Edge,
   Connection,
-  useEdgesState,
-  useNodesState,
   ReactFlow,
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
-
-const initialNodes: Node[] = [
-  {
-    id: "1",
-    type: "input",
-    data: { label: "Input Node" },
-    position: { x: 250, y: 0 },
-  },
-  {
-    id: "2",
-    data: { label: "Default Node" },
-    position: { x: 100, y: 100 },
-  },
-  {
-    id: "3",
-    data: { label: "Another Node" },
-    position: { x: 400, y: 100 },
-  },
-];
-
-const initialEdges: Edge[] = [];
+import { useDispatch, useSelector } from "react-redux";
 
 export default function Workflowspace() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const nodes = useSelector((state: RootState) => state.flow.nodes);
+  const edges = useSelector((state: RootState) => state.flow.edges);
+  const dispatch = useDispatch<AppDispatch>();
 
-  const onConnect = (connection: Connection) => setEdges((eds) => addEdge(connection, eds));
+  const onConnect = (connection: Connection) => {
+    dispatch(
+      addEdge({
+        id: `${connection.source}-${connection.target}`,
+        source: connection.source,
+        target: connection.target,
+      })
+    );
+  };
 
   const handleAddNodes = () => {
-    const newNode = {
-      id: `${Date.now()}`, // A unique ID for the new node
+    const newNode: NodeType = {
+      id: `${Date.now()}`,
       data: { label: "New Node" },
-      position: { x: 300, y: 300 }, // Define the position
+      position: { x: Math.random() * 400, y: Math.random() * 400 },
     };
-
-    setNodes((prevNodes) => [...prevNodes, newNode]);
+    dispatch(addNode(newNode));
   };
 
   const updateNodeLabel = (nodeId: string, newLabel: string) => {
@@ -61,16 +53,35 @@ export default function Workflowspace() {
     );
   };
 
-  const deleteNode = (nodeId: string) => {
-    setNodes((prevNodes) => prevNodes.filter((node) => node.id !== nodeId));
-  };
-
   const moveNode = (nodeId: string, newX: number, newY: number) => {
     setNodes((prevNodes) =>
       prevNodes.map((node) =>
         node.id === nodeId ? { ...node, position: { x: newX, y: newY } } : node
       )
     );
+  };
+
+  const onNodesChange: (changes: any[]) => void = (changes) => {
+    changes.forEach((change) => {
+      if (change.type === "remove") {
+        dispatch(deleteNode(change.id));
+      } else if (change.type === "position" && change.position) {
+        dispatch(
+          updateNodePosition({
+            id: change.id,
+            position: change.position,
+          })
+        );
+      }
+    });
+  };
+
+  const onEdgesChange: (changes: any[]) => void = (changes) => {
+    changes.forEach((change) => {
+      if (change.type === "remove") {
+        dispatch(deleteEdge(change.id));
+      }
+    });
   };
 
   return (

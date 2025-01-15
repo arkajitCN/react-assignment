@@ -1,9 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
-import workflowReducer from "./workflow/slice";
+import flowReducer from "./flow/slice";
 
 export const store = configureStore({
   reducer: {
-    workflow: workflowReducer,
+    flow: flowReducer,
   },
 });
 
