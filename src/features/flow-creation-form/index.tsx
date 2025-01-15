@@ -2,7 +2,6 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,8 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useDispatch } from "react-redux";
-import { Node } from "@xyflow/react";
+import useWorkflow from "../workflow-space/hooks/use-workflow";
 
 type FlowCreationFormProps = {
   isOpen: boolean;
@@ -31,7 +29,7 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
   const [image, setImage] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const dispatch = useDispatch();
+  const { handleAddNode } = useWorkflow();
 
   const {
     reset,
@@ -102,28 +100,14 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
   const handleFormSubmitRequest = (data: FlowCreationFormValues) => {
     const id = Date.now().toString();
 
-    // Prepare the initial flow data with a single node (or none)
-    const flowData = {
+    handleAddNode({
       id,
-      name: data.workflowName.trim(),
-      nodes: [], // Start with an empty node list
-      edges: [], // Start with an empty edge list
-    };
+      data: { label: data.workflowName },
+      position: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+    });
 
-    // Reset the form fields
     handleResetFormFields();
-
-    // Close the modal or form
     setIsOpen(false);
-
-    // Add default node after workflow creation
-    const defaultNode: Node = {
-      id: Date.now().toString(),
-      type: "input",
-      data: { label: "Input Node" }, // Node data
-      position: { x: window.innerWidth / 2, y: window.innerHeight / 2 }, // Center of the screen
-      draggable: true,
-    };
   };
 
   return (
@@ -232,21 +216,6 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
                     ]}
                     placeholder="Default Workflow Template"
                   />
-                  {/* <Controller
-                    name="owner"
-                    control={control}
-                    render={({ field }) => (
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <SelectTrigger id="owner">
-                          <SelectValue placeholder="Select owner" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="owner1">Owner 1</SelectItem>
-                          <SelectItem value="owner2">Owner 2</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  /> */}
                   {errors.owner && (
                     <span className="text-red-500 text-sm">{errors.owner.message}</span>
                   )}
@@ -258,17 +227,6 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
                     name={"description"}
                     placeholder="Enter description"
                   />
-                  {/* <Controller
-                    name="description"
-                    control={control}
-                    render={({ field }) => (
-                      <Textarea
-                        id="description"
-                        placeholder="Enter description"
-                        {...field}
-                      />
-                    )}
-                  /> */}
                   {errors.description && (
                     <span className="text-red-500 text-sm">{errors.description.message}</span>
                   )}
