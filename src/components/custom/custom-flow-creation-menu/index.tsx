@@ -14,13 +14,15 @@ import {
 
 export default function CustomFlowCreationMenu() {
   return (
-    <div className="absolute top-20 left-4 z-50">
-      <Card className="w-[300px] bg-white">
+    <div className="absolute top-10 left-4 z-10">
+      <Card className="w-[300px] bg-white shadow-md">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium text-indigo-700">Node Configuration</CardTitle>
+          <CardTitle className="text-sm font-semibold text-indigo-700">
+            Node Configuration
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <span className="text-xs font-normal text-gray-400">Node template</span>
+          <span className="text-xs font-semibold text-gray-400">Node template</span>
           <div className="space-y-2">
             <Select>
               <SelectTrigger>
@@ -38,7 +40,7 @@ export default function CustomFlowCreationMenu() {
             </Select>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-xs font-normal text-gray-400">Create Node</span>
+            <span className="text-xs font-semibold text-gray-400">Create Node</span>
             <Button size="icon" variant="ghost" className="cursor-pointer">
               <Plus className="h-4 w-4" />
               <span className="sr-only">Add node</span>

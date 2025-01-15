@@ -30,6 +30,7 @@ export default function Navbar({ setIsOpen }: NavbarProps) {
         </Button>
         <Button
           variant={"outline"}
+          disabled
           className="font-themeFont bg-indigo-700 hover:bg-indigo-900 text-white hover:text-white font-normal text-xs rounded-lg px-4 py-2"
         >
           <Save />
