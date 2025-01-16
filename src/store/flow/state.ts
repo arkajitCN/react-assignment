@@ -1,3 +1,5 @@
+import { nanoid } from "nanoid";
+
 export interface NodeType {
   id: string;
   type?: string;
@@ -21,24 +23,20 @@ export interface FlowState {
 export const initialState: FlowState = {
   nodes: [
     {
-      id: "1",
-      type: "input",
+      id: nanoid(),
       data: { label: "Input Node" },
       position: { x: 250, y: 0 },
     },
     {
-      id: "2",
+      id: nanoid(),
       data: { label: "Default Node" },
       position: { x: 100, y: 100 },
     },
     {
-      id: "3",
+      id: nanoid(),
       data: { label: "Another Node" },
       position: { x: 400, y: 100 },
     },
   ],
-  edges: [
-    { id: "e1-2", source: "1", target: "2", animated: true },
-    { id: "e1-3", source: "1", target: "3" },
-  ],
+  edges: [],
 };
