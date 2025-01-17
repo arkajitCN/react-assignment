@@ -30,21 +30,22 @@ export default function CustomFlowCreationMenu() {
   };
 
   const handleCreateNode = () => {
-    selectedNode &&
+    if (selectedNode) {
       handleAddNode({
         id: nanoid(),
-        data: { label: selectedNode.data.label + "-duplicate" },
+        data: { label: `${selectedNode.data.label}-duplicate` },
         position: { x: 0, y: 0 },
       });
+    }
   };
-
-  console.log("debug->", nodes);
 
   return (
     <div className="absolute top-10 left-4 z-10">
       <Card className="w-[300px] bg-white shadow-md">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-semibold text-indigo-700">Node Configuration</CardTitle>
+          <CardTitle className="text-sm font-semibold text-indigo-700">
+            Node Configuration
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <span className="text-xs font-semibold text-gray-400">Node template</span>
@@ -55,7 +56,9 @@ export default function CustomFlowCreationMenu() {
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectLabel>{nodes.length > 0 ? "Node Templates" : "Templates not available"}</SelectLabel>
+                  <SelectLabel>
+                    {nodes.length > 0 ? "Node Templates" : "Templates not available"}
+                  </SelectLabel>
                   {nodes &&
                     nodes.map((node) => (
                       <SelectItem key={node.id} className="cursor-pointer" value={node.data.label}>

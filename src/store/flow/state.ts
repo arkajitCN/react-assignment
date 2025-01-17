@@ -1,5 +1,3 @@
-import { nanoid } from "nanoid";
-
 export interface NodeType {
   id: string;
   type?: string;
