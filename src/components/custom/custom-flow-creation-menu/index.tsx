@@ -55,15 +55,16 @@ export default function CustomFlowCreationMenu() {
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectLabel>Node Templates</SelectLabel>
-                  {nodes.map((node) => (
-                    <SelectItem key={node.id} className="cursor-pointer" value={node.data.label}>
-                      <span className="flex items-center gap-2 text-xs text-slate-700">
-                        <Bolt size={12} />
-                        {node.data.label}
-                      </span>
-                    </SelectItem>
-                  ))}
+                  <SelectLabel>{nodes.length > 0 ? "Node Templates" : "Templates not available"}</SelectLabel>
+                  {nodes &&
+                    nodes.map((node) => (
+                      <SelectItem key={node.id} className="cursor-pointer" value={node.data.label}>
+                        <span className="flex items-center gap-2 text-xs text-slate-700">
+                          <Bolt size={12} />
+                          {node.data.label}
+                        </span>
+                      </SelectItem>
+                    ))}
                 </SelectGroup>
               </SelectContent>
             </Select>

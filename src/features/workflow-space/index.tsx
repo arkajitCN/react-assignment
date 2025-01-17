@@ -29,14 +29,18 @@ export default function Workflowspace() {
           onEdgesChange={memoizedEdgeChange}
           onConnect={memoizedOnConnect}
           nodeTypes={nodeTypes}
-          // nodesDraggable={isEditing}
-          // nodesConnectable={isEditing}
-          // elementsSelectable={isEditing}
           fitView
         >
           <Background color="#aaa" gap={16} />
           <MiniMap />
           <Controls />
+          {nodes.length === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white/70">
+              <p className="text-2xl font-bold text-indigo-700">
+                No nodes available. Start adding nodes to see your workflow!
+              </p>
+            </div>
+          )}
         </ReactFlow>
       </ReactFlowProvider>
     </div>

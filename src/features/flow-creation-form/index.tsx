@@ -96,7 +96,7 @@ const FlowCreationForm: React.FC<FlowCreationFormProps> = ({ isOpen, setIsOpen }
     handleAddNode({
       id: nanoid(),
       data: { label: data.workflowName },
-      position: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+      position: { x: 100, y: 250 },
     });
 
     handleResetFormFields();

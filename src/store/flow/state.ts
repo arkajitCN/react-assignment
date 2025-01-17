@@ -20,23 +20,28 @@ export interface FlowState {
 }
 
 // Initial state
+// export const initialState: FlowState = {
+//   nodes: [
+//     {
+//       id: nanoid(),
+//       data: { label: "Input Node" },
+//       position: { x: 250, y: 0 },
+//     },
+//     {
+//       id: nanoid(),
+//       data: { label: "Default Node" },
+//       position: { x: 100, y: 100 },
+//     },
+//     {
+//       id: nanoid(),
+//       data: { label: "Another Node" },
+//       position: { x: 400, y: 100 },
+//     },
+//   ],
+//   edges: [],
+// };
+
 export const initialState: FlowState = {
-  nodes: [
-    {
-      id: nanoid(),
-      data: { label: "Input Node" },
-      position: { x: 250, y: 0 },
-    },
-    {
-      id: nanoid(),
-      data: { label: "Default Node" },
-      position: { x: 100, y: 100 },
-    },
-    {
-      id: nanoid(),
-      data: { label: "Another Node" },
-      position: { x: 400, y: 100 },
-    },
-  ],
+  nodes: [],
   edges: [],
 };
